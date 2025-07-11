@@ -1,0 +1,372 @@
+/* ==========================================================================
+   project-detail.css - 案件詳細専用スタイル
+   ========================================================================== */
+
+/* ヘッダー */
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  border: 1px solid var(--color-border);
+}
+
+.back-btn:hover {
+  background: var(--color-bg-accent);
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.header-title {
+  color: var(--navy-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.nav-link:hover {
+  background: var(--color-bg-accent);
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* メインコンテンツ */
+.main {
+  padding: 2rem 0;
+  min-height: calc(100vh - 100px);
+}
+
+/* ステータスセクション */
+.status-section {
+  margin-bottom: 2rem;
+}
+
+.status-card {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.status-current {
+  margin-bottom: 2rem;
+}
+
+.status-label {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-display .status-badge {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.status-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+}
+
+.progress-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.progress-circle.active {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.progress-circle.completed {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+.progress-label {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.progress-line {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--color-border);
+  z-index: 1;
+}
+
+.progress-line.completed {
+  background: var(--green);
+}
+
+.progress-step:last-child .progress-line {
+  display: none;
+}
+
+/* クイックアクション */
+.quick-actions {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.quick-actions h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--navy-blue);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--white);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: var(--color-bg-accent);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.action-icon {
+  font-size: 1.2rem;
+}
+
+/* 情報セクション */
+.info-section {
+  margin-bottom: 2rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.info-item span {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* 金額・スケジュール */
+.amount-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.amount-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.amount-item label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+}
+
+.amount.contract {
+  color: var(--green);
+}
+
+.schedule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.schedule-item:last-child {
+  border-bottom: none;
+}
+
+.schedule-item label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.schedule-item span {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* ステータス履歴 */
+.history-section {
+  margin-bottom: 2rem;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-border-light);
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 1rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 2px var(--primary-blue);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-status {
+  font-weight: 600;
+  color: var(--navy-
