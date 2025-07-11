@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現場管理 - 案件管理システム</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/site-management.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="header-title">現場管理</h1>
+                <nav class="header-nav">
+                    <a href="index.html" class="nav-link">ダッシュボード</a>
+                    <a href="site-management.html" class="nav-link active">現場管理</a>
+                    <a href="gantt-chart.html" class="nav-link">工程表</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="refreshBtn">
+                        <span class="btn-icon">🔄</span>
+                        更新
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main">
+        <div class="container">
+            <!-- ステータス概要 -->
+            <section class="overview-section">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="overview-card pending">
+                            <div class="overview-icon">📋</div>
+                            <div class="overview-content">
+                                <div class="overview-number" id="pendingCount">0</div>
+                                <div class="overview-label">施工前</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="overview-card active">
+                            <div class="overview-icon">🏗️</div>
+                            <div class="overview-content">
+                                <div class="overview-number" id="activeCount">0</div>
+                                <div class="overview-label">施工中</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="overview-card urgent">
+                            <div class="overview-icon">⚠️</div>
+                            <div class="overview-content">
+                                <div class="overview-number" id="urgentCount">0</div>
+                                <div class="overview-label">要注意</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="overview-card completed">
+                            <div class="overview-icon">✅</div>
+                            <div class="overview-content">
+                                <div class="overview-number" id="completedCount">0</div>
+                                <div class="overview-label">今月完了</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- フィルター -->
+            <section class="filter-section">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <select class="form-control" id="statusFilter">
+                                        <option value="">全てのステータス</option>
+                                        <option value="受注">受注</option>
+                                        <option value="施工前">施工前</option>
+                                        <option value="施工中">施工中</option>
+                                        <option value="施工完了">施工完了</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <select class="form-control" id="managerFilter">
+                                        <option value="">全ての現場管理者</option>
+                                        <!-- 動的に追加 -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <select class="form-control" id="urgencyFilter">
+                                        <option value="">緊急度</option>
+                                        <option value="normal">通常</option>
+                                        <option value="attention">要注意</option>
+                                        <option value="urgent">緊急</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-outline" id="clearFilters">クリア</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 現場カード表示 -->
+            <section class="sites-section">
+                <div class="sites-header">
+                    <h2>現場一覧</h2>
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="cards">
+                            <span>📋</span>
+                            カード
+                        </button>
+                        <button class="toggle-btn" data-view="list">
+                            <span>📝</span>
+                            リスト
+                        </button>
+                    </div>
+                </div>
+
+                <!-- カード表示 -->
+                <div class="sites-grid" id="sitesGrid">
+                    <!-- 現場カードが動的に生成される -->
+                </div>
+
+                <!-- リスト表示 -->
+                <div class="sites-list" id="sitesList" style="display: none;">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-container">
+                                <table class="sites-table">
+                                    <thead>
+                                        <tr>
+                                            <th>案件名</th>
+                                            <th>顧客</th>
+                                            <th>現場管理者</th>
+                                            <th>工期</th>
+                                            <th>進捗</th>
+                                            <th>ステータス</th>
+                                            <th>緊急度</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sitesTableBody">
+                                        <!-- 現場データが動的に挿入される -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- データがない場合の表示 -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">🏗️</div>
+                    <h3>現場がありません</h3>
+                    <p>受注済みの案件がここに表示されます</p>
+                    <a href="index.html" class="btn btn-primary">ダッシュボードへ</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 現場詳細モーダル -->
+    <div class="modal" id="siteDetailModal">
+        <div class="modal-backdrop" onclick="closeModal('siteDetailModal')"></div>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="siteDetailTitle">現場詳細</h3>
+                <button class="modal-close" onclick="closeModal('siteDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="site-detail-content">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="detail-section">
+                                <h4>基本情報</h4>
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <label>案件名</label>
+                                        <span id="detailProjectName">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>顧客名</label>
+                                        <span id="detailClientName">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>現場住所</label>
+                                        <span id="detailSiteAddress">-</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <label>現場管理者</label>
+                                        <span id="detailSiteManager">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>工程・進捗</h4>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="detailProgress" style="width: 0%"></div>
+                                    </div>
+                                    <span class="progress-text" id="detailProgressText">0%</span>
+                                </div>
+                                <div class="schedule-details">
+                                    <div class="schedule-row">
+                                        <span>着工予定：</span>
+                                        <span id="detailStartDate">-</span>
+                                    </div>
+                                    <div class="schedule-row">
+                                        <span>完了予定：</span>
+                                        <span id="detailEndDate">-</span>
+                                    </div>
+                                    <div class="schedule-row">
+                                        <span>実着工日：</span>
+                                        <span id="detailActualStartDate">-</span>
+                                    </div>
+                                    <div class="schedule-row">
+                                        <span>残り日数：</span>
+                                        <span id="detailRemainingDays" class="remaining-days">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="detail-section">
+                                <h4>クイックアクション</h4>
+                                <div class="quick-actions">
+                                    <button class="action-btn" id="detailCallClient">
+                                        <span class="action-icon">📞</span>
+                                        顧客に電話
+                                    </button>
+                                    <button class="action-btn" id="detailUpdateStatus">
+                                        <span class="action-icon">📝</span>
+                                        ステータス更新
+                                    </button>
+                                    <button class="action-btn" id="detailViewProject">
+                                        <span class="action-icon">👁️</span>
+                                        案件詳細を見る
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>緊急度設定</h4>
+                                <select class="form-control" id="detailUrgency">
+                                    <option value="normal">通常</option>
+                                    <option value="attention">要注意</option>
+                                    <option value="urgent">緊急</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary mt-2" id="updateUrgencyBtn">更新</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('siteDetailModal')">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知トースト -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/project-handler.js"></script>
+    <script src="js/status-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // ページ初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // アプリケーション初期化
+            initializeApp();
+            
+            // 現場データ読み込み・表示
+            loadSiteManagement();
+            
+            // イベントリスナー設定
+            setupEventListeners();
+        });
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // 更新ボタン
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                refreshSiteData();
+            });
+
+            // フィルター
+            document.getElementById('statusFilter').addEventListener('change', filterSites);
+            document.getElementById('managerFilter').addEventListener('change', filterSites);
+            document.getElementById('urgencyFilter').addEventListener('change', filterSites);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+
+            // 表示切り替え
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    toggleView(this.dataset.view);
+                });
+            });
+
+            // 緊急度更新
+            document.getElementById('updateUrgencyBtn').addEventListener('click', function() {
+                updateSiteUrgency();
+            });
+        }
+
+        // 表示切り替え
+        function toggleView(view) {
+            // ボタンの状態更新
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+            // 表示切り替え
+            if (view === 'cards') {
+                document.getElementById('sitesGrid').style.display = 'grid';
+                document.getElementById('sitesList').style.display = 'none';
+            } else {
+                document.getElementById('sitesGrid').style.display = 'none';
+                document.getElementById('sitesList').style.display = 'block';
+            }
+        }
+
+        // モーダル開閉
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 現場詳細表示
+        function showSiteDetail(siteId) {
+            // 現場データを取得してモーダルに表示
+            console.log('現場詳細表示:', siteId);
+            openModal('siteDetailModal');
+        }
+
+        // プレースホルダー関数（後で実装）
+        function initializeApp() {
+            console.log('アプリケーション初期化中...');
+        }
+
+        function loadSiteManagement() {
+            console.log('現場管理データ読み込み中...');
+        }
+
+        function refreshSiteData() {
+            console.log('現場データ更新中...');
+        }
+
+        function filterSites() {
+            console.log('現場フィルタリング中...');
+        }
+
+        function clearFilters() {
+            console.log('フィルタークリア中...');
+        }
+
+        function updateSiteUrgency() {
+            console.log('緊急度更新中...');
+        }
+    </script>
+</body>
+</html>
