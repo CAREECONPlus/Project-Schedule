@@ -369,4 +369,334 @@
 
 .timeline-status {
   font-weight: 600;
-  color: var(--navy-
+  color: var(--navy-blue);
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.timeline-user {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-notes {
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* チームセクション */
+.team-section {
+  margin-bottom: 2rem;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius);
+  background: var(--color-bg-accent);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 600;
+  color: var(--navy-blue);
+  margin-bottom: 0.125rem;
+}
+
+.member-role {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* モーダル拡張 */
+.modal-content.modal-lg {
+  max-width: 800px;
+}
+
+/* アラートボックス */
+.alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background: rgba(36, 78, 255, 0.1);
+  border: 1px solid rgba(36, 78, 255, 0.2);
+  margin-top: 1rem;
+}
+
+.alert-icon {
+  font-size: 1.2rem;
+  color: var(--primary-blue);
+}
+
+.alert-content {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+}
+
+.alert-content strong {
+  color: var(--navy-blue);
+}
+
+/* フォーム拡張 */
+.form-group.status-dependent {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: var(--transition-normal);
+}
+
+.form-group.status-dependent.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ステータス変更フォーム専用 */
+#statusChangeForm .status-badge {
+  display: inline-flex;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .header-nav {
+    order: 2;
+  }
+  
+  .header-actions {
+    order: 1;
+    align-self: flex-end;
+  }
+  
+  .status-section .row {
+    flex-direction: column;
+  }
+  
+  .status-card {
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .status-progress {
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  
+  .progress-step {
+    min-width: 80px;
+  }
+  
+  .info-section .row {
+    flex-direction: column;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .amount-schedule {
+    gap: 1rem;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    margin: 0.5rem;
+    max-width: none;
+  }
+  
+  .modal-content.modal-lg {
+    max-width: none;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .header-title {
+    font-size: 1.25rem;
+  }
+  
+  .nav-link {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .status-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .progress-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.7rem;
+  }
+  
+  .progress-label {
+    font-size: 0.7rem;
+  }
+  
+  .action-buttons {
+    gap: 0.5rem;
+  }
+  
+  .action-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .amount {
+    font-size: 1.25rem;
+  }
+  
+  .timeline {
+    padding-left: 1.5rem;
+  }
+  
+  .timeline::before {
+    left: 0.5rem;
+  }
+  
+  .timeline-item::before {
+    left: -1.25rem;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .timeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .team-member {
+    padding: 0.75rem;
+  }
+  
+  .member-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+}
+
+/* アニメーション */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.status-card,
+.quick-actions,
+.card {
+  animation: slideInUp 0.3s ease;
+}
+
+.timeline-item {
+  animation: fadeIn 0.3s ease;
+}
+
+.timeline-item:nth-child(odd) {
+  animation-delay: 0.1s;
+}
+
+.timeline-item:nth-child(even) {
+  animation-delay: 0.2s;
+}
+
+/* 印刷スタイル */
+@media print {
+  .header-nav,
+  .header-actions,
+  .quick-actions,
+  .modal,
+  .toast-container {
+    display: none !important;
+  }
+  
+  .main {
+    padding: 0;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+  }
+  
+  .status-card {
+    break-inside: avoid;
+  }
+}
