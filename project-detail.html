@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案件詳細 - 案件管理システム</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/project-detail.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="index.html" class="back-btn">
+                        <span>←</span>
+                        ダッシュボードに戻る
+                    </a>
+                    <h1 class="header-title" id="projectTitle">案件詳細</h1>
+                </div>
+                <nav class="header-nav">
+                    <a href="index.html" class="nav-link">ダッシュボード</a>
+                    <a href="site-management.html" class="nav-link">現場管理</a>
+                    <a href="gantt-chart.html" class="nav-link">工程表</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="editProjectBtn">編集</button>
+                    <button class="btn btn-danger" id="deleteProjectBtn">削除</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main">
+        <div class="container">
+            <!-- ステータス＆クイックアクション -->
+            <section class="status-section">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="status-card">
+                            <div class="status-current">
+                                <span class="status-label">現在のステータス</span>
+                                <div class="status-display">
+                                    <span class="status-badge" id="currentStatus">見積</span>
+                                    <button class="btn btn-sm btn-primary" id="changeStatusBtn">ステータス変更</button>
+                                </div>
+                            </div>
+                            <div class="status-progress" id="statusProgress">
+                                <!-- ステータス進捗バーが動的に生成される -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="quick-actions">
+                            <h3>クイックアクション</h3>
+                            <div class="action-buttons">
+                                <button class="action-btn" id="callClientBtn">
+                                    <span class="action-icon">📞</span>
+                                    顧客に電話
+                                </button>
+                                <button class="action-btn" id="emailClientBtn">
+                                    <span class="action-icon">✉️</span>
+                                    メール送信
+                                </button>
+                                <button class="action-btn" id="generateReportBtn">
+                                    <span class="action-icon">📄</span>
+                                    報告書作成
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 基本情報 -->
+            <section class="info-section">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>基本情報</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <label>案件名</label>
+                                        <span id="projectName">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>顧客名</label>
+                                        <span id="clientName">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>電話番号</label>
+                                        <span id="clientPhone">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>メールアドレス</label>
+                                        <span id="clientEmail">-</span>
+                                    </div>
+                                    <div class="info-item full-width">
+                                        <label>住所</label>
+                                        <span id="clientAddress">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>プロジェクトマネージャー</label>
+                                        <span id="projectManager">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>現場管理者</label>
+                                        <span id="siteManager">-</span>
+                                    </div>
+                                    <div class="info-item full-width">
+                                        <label>備考</label>
+                                        <span id="projectNotes">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>金額・スケジュール</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="amount-schedule">
+                                    <div class="amount-item">
+                                        <label>見積金額</label>
+                                        <span class="amount" id="estimateAmount">¥0</span>
+                                    </div>
+                                    <div class="amount-item">
+                                        <label>契約金額</label>
+                                        <span class="amount contract" id="contractAmount">¥0</span>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <label>着工予定日</label>
+                                        <span id="startDate">-</span>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <label>完了予定日</label>
+                                        <span id="endDate">-</span>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <label>実着工日</label>
+                                        <span id="actualStartDate">-</span>
+                                    </div>
+                                    <div class="schedule-item">
+                                        <label>実完了日</label>
+                                        <span id="actualEndDate">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ステータス履歴 -->
+            <section class="history-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>ステータス履歴</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline" id="statusHistory">
+                            <!-- ステータス履歴が動的に生成される -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 作業者・チーム -->
+            <section class="team-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>作業チーム</h2>
+                        <button class="btn btn-sm btn-outline" id="editTeamBtn">編集</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="team-grid" id="teamMembers">
+                            <!-- チームメンバーが動的に生成される -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ステータス変更モーダル -->
+    <div class="modal" id="statusChangeModal">
+        <div class="modal-backdrop" onclick="closeModal('statusChangeModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ステータス変更</h3>
+                <button class="modal-close" onclick="closeModal('statusChangeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="statusChangeForm">
+                    <div class="form-group">
+                        <label class="form-label">現在のステータス</label>
+                        <span id="currentStatusDisplay" class="status-badge">見積</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="newStatus">新しいステータス *</label>
+                        <select class="form-control" id="newStatus" required>
+                            <option value="">選択してください</option>
+                            <option value="見積">見積</option>
+                            <option value="受注">受注</option>
+                            <option value="施工前">施工前</option>
+                            <option value="施工中">施工中</option>
+                            <option value="施工完了">施工完了</option>
+                            <option value="案件完了">案件完了</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="contractAmountGroup" style="display: none;">
+                        <label class="form-label" for="statusContractAmount">契約金額</label>
+                        <input type="number" class="form-control" id="statusContractAmount" step="1000" placeholder="受注時は契約金額を入力">
+                    </div>
+
+                    <div class="form-group" id="actualDateGroup" style="display: none;">
+                        <label class="form-label" for="actualDate">実績日付</label>
+                        <input type="date" class="form-control" id="actualDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="statusNotes">変更理由・備考</label>
+                        <textarea class="form-control" id="statusNotes" rows="3" placeholder="ステータス変更の理由や備考を入力"></textarea>
+                    </div>
+
+                    <div class="alert-box" id="autoTicketAlert" style="display: none;">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+                            <strong>自動起票について</strong><br>
+                            「受注」に変更すると、現場管理者に自動で案件が起票されます。
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('statusChangeModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="statusChangeForm" id="confirmStatusChange">変更</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編集モーダル -->
+    <div class="modal" id="editProjectModal">
+        <div class="modal-backdrop" onclick="closeModal('editProjectModal')"></div>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>案件編集</h3>
+                <button class="modal-close" onclick="closeModal('editProjectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProjectForm">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editProjectName">案件名 *</label>
+                                <input type="text" class="form-control" id="editProjectName" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editClientName">顧客名 *</label>
+                                <input type="text" class="form-control" id="editClientName" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editClientPhone">電話番号</label>
+                                <input type="tel" class="form-control" id="editClientPhone">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editClientEmail">メールアドレス</label>
+                                <input type="email" class="form-control" id="editClientEmail">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editClientAddress">住所</label>
+                        <input type="text" class="form-control" id="editClientAddress">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="editEstimateAmount">見積金額</label>
+                                <input type="number" class="form-control" id="editEstimateAmount" step="1000">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="editStartDate">着工予定日</label>
+                                <input type="date" class="form-control" id="editStartDate">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="editEndDate">完了予定日</label>
+                                <input type="date" class="form-control" id="editEndDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editProjectManager">プロジェクトマネージャー</label>
+                                <select class="form-control" id="editProjectManager">
+                                    <!-- 動的に追加 -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="editSiteManager">現場管理者</label>
+                                <select class="form-control" id="editSiteManager">
+                                    <!-- 動的に追加 -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editProjectNotes">備考</label>
+                        <textarea class="form-control" id="editProjectNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editProjectModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="editProjectForm">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認ダイアログ -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-backdrop" onclick="closeModal('confirmModal')"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3 id="confirmTitle">確認</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">キャンセル</button>
+                <button type="button" class="btn btn-danger" id="confirmButton">削除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知トースト -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/project-handler.js"></script>
+    <script src="js/status-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // URLパラメータから案件IDを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('id');
+
+        // ページ初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!projectId) {
+                // IDがない場合はダッシュボードにリダイレクト
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // アプリケーション初期化
+            initializeApp();
+            
+            // 案件データ読み込み・表示
+            loadProjectDetail(projectId);
+            
+            // イベントリスナー設定
+            setupEventListeners();
+        });
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // ステータス変更
+            document.getElementById('changeStatusBtn').addEventListener('click', function() {
+                openModal('statusChangeModal');
+            });
+
+            // 編集
+            document.getElementById('editProjectBtn').addEventListener('click', function() {
+                openModal('editProjectModal');
+            });
+
+            // 削除
+            document.getElementById('deleteProjectBtn').addEventListener('click', function() {
+                confirmDeleteProject();
+            });
+
+            // フォーム送信
+            document.getElementById('statusChangeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                changeProjectStatus();
+            });
+
+            document.getElementById('editProjectForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateProject();
+            });
+
+            // ステータス選択変更時の処理
+            document.getElementById('newStatus').addEventListener('change', function() {
+                handleStatusSelectChange(this.value);
+            });
+
+            // クイックアクション
+            document.getElementById('callClientBtn').addEventListener('click', function() {
+                callClient();
+            });
+
+            document.getElementById('emailClientBtn').addEventListener('click', function() {
+                emailClient();
+            });
+        }
+
+        // モーダル開閉
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // プレースホルダー関数（後で実装）
+        function initializeApp() {
+            console.log('アプリケーション初期化中...');
+        }
+
+        function loadProjectDetail(id) {
+            console.log('案件詳細読み込み中...', id);
+        }
+
+        function changeProjectStatus() {
+            console.log('ステータス変更中...');
+        }
+
+        function updateProject() {
+            console.log('案件更新中...');
+        }
+
+        function confirmDeleteProject() {
+            console.log('案件削除確認...');
+        }
+
+        function handleStatusSelectChange(status) {
+            console.log('ステータス選択変更:', status);
+        }
+
+        function callClient() {
+            console.log('顧客に電話...');
+        }
+
+        function emailClient() {
+            console.log('メール送信...');
+        }
+    </script>
+</body>
+</html>
