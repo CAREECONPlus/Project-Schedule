@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程表 - 案件管理システム</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/gantt-chart.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="header-title">工程表</h1>
+                <nav class="header-nav">
+                    <a href="index.html" class="nav-link">ダッシュボード</a>
+                    <a href="site-management.html" class="nav-link">現場管理</a>
+                    <a href="gantt-chart.html" class="nav-link active">工程表</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-outline" id="exportGanttBtn">
+                        <span class="btn-icon">📄</span>
+                        エクスポート
+                    </button>
+                    <button class="btn btn-primary" id="todayBtn">
+                        <span class="btn-icon">📅</span>
+                        今日
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main">
+        <div class="container-fluid">
+            <!-- コントロールパネル -->
+            <section class="control-panel">
+                <div class="row align-items-center">
+                    <div class="col-3">
+                        <div class="date-range-selector">
+                            <label class="form-label">表示期間</label>
+                            <div class="date-inputs">
+                                <input type="date" class="form-control" id="startDate">
+                                <span class="date-separator">〜</span>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="form-label">表示単位</label>
+                            <select class="form-control" id="timeScale">
+                                <option value="days">日単位</option>
+                                <option value="weeks" selected>週単位</option>
+                                <option value="months">月単位</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label class="form-label">フィルター</label>
+                            <select class="form-control" id="ganttFilter">
+                                <option value="">全ての案件</option>
+                                <option value="受注">受注済み</option>
+                                <option value="施工前">施工前</option>
+                                <option value="施工中">施工中</option>
+                                <option value="施工完了">施工完了</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="view-options">
+                            <label class="form-label">表示オプション</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="showWeekends" checked>
+                                    <span>土日表示</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="showMilestones" checked>
+                                    <span>マイルストーン</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ガントチャート -->
+            <section class="gantt-section">
+                <div class="gantt-container">
+                    <!-- プロジェクトリスト（左側） -->
+                    <div class="gantt-sidebar">
+                        <div class="sidebar-header">
+                            <div class="header-cell project-name">案件名</div>
+                            <div class="header-cell manager">担当者</div>
+                            <div class="header-cell status">ステータス</div>
+                        </div>
+                        <div class="sidebar-body" id="ganttSidebar">
+                            <!-- プロジェクト行が動的に生成される -->
+                        </div>
+                    </div>
+
+                    <!-- チャート部分（右側） -->
+                    <div class="gantt-chart">
+                        <div class="chart-header" id="chartHeader">
+                            <!-- 日付ヘッダーが動的に生成される -->
+                        </div>
+                        <div class="chart-body" id="chartBody">
+                            <!-- ガントバーが動的に生成される -->
+                        </div>
+                        
+                        <!-- 今日の線 -->
+                        <div class="today-line" id="todayLine"></div>
+                    </div>
+                </div>
+
+                <!-- レジェンド -->
+                <div class="gantt-legend">
+                    <div class="legend-item">
+                        <div class="legend-color estimate"></div>
+                        <span>見積・受注</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color pre-construction"></div>
+                        <span>施工前</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color construction"></div>
+                        <span>施工中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color completed"></div>
+                        <span>完了</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color milestone"></div>
+                        <span>マイルストーン</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color today"></div>
+                        <span>今日</span>
+                    </div>
+                </div>
+
+                <!-- データがない場合の表示 -->
+                <div class="empty-state" id="ganttEmptyState" style="display: none;">
+                    <div class="empty-icon">📊</div>
+                    <h3>表示する案件がありません</h3>
+                    <p>選択した期間・条件に該当する案件がありません</p>
+                    <button class="btn btn-outline" onclick="clearGanttFilters()">フィルターをクリア</button>
+                </div>
+            </section>
+
+            <!-- 統計情報 -->
+            <section class="stats-section">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalProjects">0</div>
+                                <div class="stat-label">総案件数</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="activeProjects">0</div>
+                                <div class="stat-label">進行中</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="upcomingDeadlines">0</div>
+                                <div class="stat-label">今週期限</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="delayedProjects">0</div>
+                                <div class="stat-label">遅延</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 重複チェック・リソース管理 -->
+            <section class="resource-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>リソース配分</h2>
+                        <button class="btn btn-sm btn-outline" id="analyzeResourceBtn">分析</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="resource-grid" id="resourceGrid">
+                            <!-- リソース配分情報が動的に生成される -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 案件詳細ポップオーバー -->
+    <div class="popover" id="projectPopover" style="display: none;">
+        <div class="popover-header">
+            <h4 id="popoverTitle">案件名</h4>
+            <button class="popover-close" onclick="hidePopover()">&times;</button>
+        </div>
+        <div class="popover-body">
+            <div class="popover-info">
+                <div class="info-row">
+                    <span class="info-label">顧客：</span>
+                    <span id="popoverClient">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">担当者：</span>
+                    <span id="popoverManager">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">工期：</span>
+                    <span id="popoverDuration">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">進捗：</span>
+                    <span id="popoverProgress">-</span>
+                </div>
+            </div>
+            <div class="popover-actions">
+                <button class="btn btn-sm btn-primary" id="popoverViewDetail">詳細を見る</button>
+                <button class="btn btn-sm btn-outline" id="popoverUpdateStatus">ステータス更新</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 期間設定プリセットモーダル -->
+    <div class="modal" id="periodPresetModal">
+        <div class="modal-backdrop" onclick="closeModal('periodPresetModal')"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>期間設定</h3>
+                <button class="modal-close" onclick="closeModal('periodPresetModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-period="thisWeek">今週</button>
+                    <button class="preset-btn" data-period="nextWeek">来週</button>
+                    <button class="preset-btn" data-period="thisMonth">今月</button>
+                    <button class="preset-btn" data-period="nextMonth">来月</button>
+                    <button class="preset-btn" data-period="thisQuarter">今四半期</button>
+                    <button class="preset-btn" data-period="nextQuarter">来四半期</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('periodPresetModal')">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知トースト -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/project-handler.js"></script>
+    <script src="js/status-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // ガントチャート関連の変数
+        let ganttData = [];
+        let currentTimeScale = 'weeks';
+        let ganttStartDate = new Date();
+        let ganttEndDate = new Date();
+
+        // ページ初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // アプリケーション初期化
+            initializeApp();
+            
+            // デフォルト期間設定（今月）
+            setDefaultDateRange();
+            
+            // ガントチャート初期化
+            initializeGanttChart();
+            
+            // イベントリスナー設定
+            setupEventListeners();
+        });
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // 日付変更
+            document.getElementById('startDate').addEventListener('change', updateGanttChart);
+            document.getElementById('endDate').addEventListener('change', updateGanttChart);
+
+            // 表示単位変更
+            document.getElementById('timeScale').addEventListener('change', function() {
+                currentTimeScale = this.value;
+                updateGanttChart();
+            });
+
+            // フィルター
+            document.getElementById('ganttFilter').addEventListener('change', filterGanttChart);
+            document.getElementById('showWeekends').addEventListener('change', updateGanttChart);
+            document.getElementById('showMilestones').addEventListener('change', updateGanttChart);
+
+            // 今日ボタン
+            document.getElementById('todayBtn').addEventListener('click', function() {
+                scrollToToday();
+            });
+
+            // エクスポート
+            document.getElementById('exportGanttBtn').addEventListener('click', function() {
+                exportGanttChart();
+            });
+
+            // リソース分析
+            document.getElementById('analyzeResourceBtn').addEventListener('click', function() {
+                analyzeResourceAllocation();
+            });
+
+            // 期間プリセット
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    setPeriodPreset(this.dataset.period);
+                    closeModal('periodPresetModal');
+                });
+            });
+
+            // チャートスクロール同期
+            const chartBody = document.getElementById('chartBody');
+            const ganttSidebar = document.getElementById('ganttSidebar');
+            
+            chartBody.addEventListener('scroll', function() {
+                ganttSidebar.scrollTop = this.scrollTop;
+            });
+
+            ganttSidebar.addEventListener('scroll', function() {
+                chartBody.scrollTop = this.scrollTop;
+            });
+        }
+
+        // デフォルト期間設定
+        function setDefaultDateRange() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
+            document.getElementById('startDate').value = formatDate(firstDay);
+            document.getElementById('endDate').value = formatDate(lastDay);
+
+            ganttStartDate = firstDay;
+            ganttEndDate = lastDay;
+        }
+
+        // 期間プリセット設定
+        function setPeriodPreset(period) {
+            const today = new Date();
+            let startDate, endDate;
+
+            switch (period) {
+                case 'thisWeek':
+                    startDate = getWeekStart(today);
+                    endDate = getWeekEnd(today);
+                    break;
+                case 'nextWeek':
+                    const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    startDate = getWeekStart(nextWeek);
+                    endDate = getWeekEnd(nextWeek);
+                    break;
+                case 'thisMonth':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    break;
+                case 'nextMonth':
+                    startDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+                    break;
+                case 'thisQuarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    startDate = new Date(today.getFullYear(), quarter * 3, 1);
+                    endDate = new Date(today.getFullYear(), quarter * 3 + 3, 0);
+                    break;
+                case 'nextQuarter':
+                    const nextQuarter = Math.floor(today.getMonth() / 3) + 1;
+                    startDate = new Date(today.getFullYear(), nextQuarter * 3, 1);
+                    endDate = new Date(today.getFullYear(), nextQuarter * 3 + 3, 0);
+                    break;
+            }
+
+            document.getElementById('startDate').value = formatDate(startDate);
+            document.getElementById('endDate').value = formatDate(endDate);
+
+            ganttStartDate = startDate;
+            ganttEndDate = endDate;
+
+            updateGanttChart();
+        }
+
+        // ユーティリティ関数
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 月曜日を週の始まりとする
+            return new Date(d.setDate(diff));
+        }
+
+        function getWeekEnd(date) {
+            const start = getWeekStart(date);
+            return new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
+        }
+
+        // モーダル開閉
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // ポップオーバー表示・非表示
+        function showPopover(projectId, x, y) {
+            const popover = document.getElementById('projectPopover');
+            // プロジェクトデータを取得してポップオーバーに表示
+            console.log('ポップオーバー表示:', projectId);
+            
+            popover.style.display = 'block';
+            popover.style.left = x + 'px';
+            popover.style.top = y + 'px';
+        }
+
+        function hidePopover() {
+            document.getElementById('projectPopover').style.display = 'none';
+        }
+
+        // プレースホルダー関数（後で実装）
+        function initializeApp() {
+            console.log('アプリケーション初期化中...');
+        }
+
+        function initializeGanttChart() {
+            console.log('工程表初期化中...');
+        }
+
+        function updateGanttChart() {
+            console.log('工程表更新中...');
+        }
+
+        function filterGanttChart() {
+            console.log('工程表フィルタリング中...');
+        }
+
+        function clearGanttFilters() {
+            console.log('工程表フィルタークリア中...');
+        }
+
+        function scrollToToday() {
+            console.log('今日の位置にスクロール中...');
+        }
+
+        function exportGanttChart() {
+            console.log('工程表エクスポート中...');
+        }
+
+        function analyzeResourceAllocation() {
+            console.log('リソース配分分析中...');
+        }
+    </script>
+</body>
+</html>
