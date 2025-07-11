@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>案件管理システム - ダッシュボード</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="header-title">案件管理システム</h1>
+                <nav class="header-nav">
+                    <a href="index.html" class="nav-link active">ダッシュボード</a>
+                    <a href="site-management.html" class="nav-link">現場管理</a>
+                    <a href="gantt-chart.html" class="nav-link">工程表</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="addProjectBtn">
+                        <span class="btn-icon">+</span>
+                        新規案件
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="main">
+        <div class="container">
+            <!-- サマリーカード -->
+            <section class="summary-section">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="summary-card">
+                            <div class="summary-icon estimate">
+                                <span>📋</span>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="estimateCount">0</div>
+                                <div class="summary-label">見積中</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="summary-card">
+                            <div class="summary-icon order">
+                                <span>✅</span>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="orderCount">0</div>
+                                <div class="summary-label">受注済</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="summary-card">
+                            <div class="summary-icon construction">
+                                <span>🏗️</span>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="constructionCount">0</div>
+                                <div class="summary-label">施工中</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="summary-card">
+                            <div class="summary-icon completed">
+                                <span>🎉</span>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="completedCount">0</div>
+                                <div class="summary-label">完了</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- フィルター・検索セクション -->
+            <section class="filter-section">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="案件名・顧客名で検索">
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <select class="form-control" id="statusFilter">
+                                        <option value="">全てのステータス</option>
+                                        <option value="見積">見積</option>
+                                        <option value="受注">受注</option>
+                                        <option value="施工前">施工前</option>
+                                        <option value="施工中">施工中</option>
+                                        <option value="施工完了">施工完了</option>
+                                        <option value="案件完了">案件完了</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <select class="form-control" id="managerFilter">
+                                        <option value="">全ての担当者</option>
+                                        <!-- 動的に追加 -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-outline" id="clearFilters">クリア</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 案件一覧テーブル -->
+            <section class="projects-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>案件一覧</h2>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn-outline" id="exportBtn">エクスポート</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="projects-table">
+                                <thead>
+                                    <tr>
+                                        <th>案件名</th>
+                                        <th>顧客</th>
+                                        <th>担当者</th>
+                                        <th>見積金額</th>
+                                        <th>契約金額</th>
+                                        <th>工期</th>
+                                        <th>ステータス</th>
+                                        <th>更新日</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projectsTableBody">
+                                    <!-- 動的に案件データが挿入されます -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- データがない場合の表示 -->
+                        <div class="empty-state" id="emptyState" style="display: none;">
+                            <div class="empty-icon">📋</div>
+                            <h3>案件がありません</h3>
+                            <p>新しい案件を追加して始めましょう</p>
+                            <button class="btn btn-primary" onclick="document.getElementById('addProjectBtn').click()">
+                                新規案件を追加
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- 新規案件追加モーダル -->
+    <div class="modal" id="addProjectModal">
+        <div class="modal-backdrop" onclick="closeModal('addProjectModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新規案件追加</h3>
+                <button class="modal-close" onclick="closeModal('addProjectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addProjectForm">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="projectName">案件名 *</label>
+                                <input type="text" class="form-control" id="projectName" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="clientName">顧客名 *</label>
+                                <input type="text" class="form-control" id="clientName" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="clientPhone">電話番号</label>
+                                <input type="tel" class="form-control" id="clientPhone">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="clientEmail">メールアドレス</label>
+                                <input type="email" class="form-control" id="clientEmail">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="clientAddress">住所</label>
+                        <input type="text" class="form-control" id="clientAddress">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="estimateAmount">見積金額</label>
+                                <input type="number" class="form-control" id="estimateAmount" step="1000">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="startDate">着工予定日</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="form-label" for="endDate">完了予定日</label>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="projectManager">プロジェクトマネージャー</label>
+                                <select class="form-control" id="projectManager">
+                                    <!-- 動的に追加 -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="form-label" for="siteManager">現場管理者</label>
+                                <select class="form-control" id="siteManager">
+                                    <!-- 動的に追加 -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="projectNotes">備考</label>
+                        <textarea class="form-control" id="projectNotes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addProjectModal')">キャンセル</button>
+                <button type="submit" class="btn btn-primary" form="addProjectForm">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認ダイアログ -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-backdrop" onclick="closeModal('confirmModal')"></div>
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3 id="confirmTitle">確認</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('confirmModal')">キャンセル</button>
+                <button type="button" class="btn btn-primary" id="confirmButton">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知トースト -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/project-handler.js"></script>
+    <script src="js/status-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // ページ初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // アプリケーション初期化
+            initializeApp();
+            
+            // 案件データ読み込み・表示
+            loadProjects();
+            
+            // イベントリスナー設定
+            setupEventListeners();
+        });
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // 新規案件追加ボタン
+            document.getElementById('addProjectBtn').addEventListener('click', function() {
+                openModal('addProjectModal');
+            });
+
+            // 検索・フィルター
+            document.getElementById('searchInput').addEventListener('input', filterProjects);
+            document.getElementById('statusFilter').addEventListener('change', filterProjects);
+            document.getElementById('managerFilter').addEventListener('change', filterProjects);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+
+            // フォーム送信
+            document.getElementById('addProjectForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewProject();
+            });
+        }
+
+        // モーダル開閉
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // フォームリセット
+            if (modalId === 'addProjectModal') {
+                document.getElementById('addProjectForm').reset();
+            }
+        }
+
+        // プレースホルダー関数（後で実装）
+        function initializeApp() {
+            console.log('アプリケーション初期化中...');
+        }
+
+        function loadProjects() {
+            console.log('案件データ読み込み中...');
+        }
+
+        function filterProjects() {
+            console.log('案件フィルタリング中...');
+        }
+
+        function clearFilters() {
+            console.log('フィルタークリア中...');
+        }
+
+        function addNewProject() {
+            console.log('新規案件追加中...');
+        }
+    </script>
+</body>
+</html>
